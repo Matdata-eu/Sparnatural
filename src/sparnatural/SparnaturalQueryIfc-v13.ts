@@ -83,7 +83,7 @@ export type ObjectCriteria = {
 export type LabelledFilter = {
   type: "labelledFilter";
   label: string;
-  filter: DateFilter | MapFilter | NumberFilter | SearchFilter | TimeFilter | GeoFilter;
+  filter: DateFilter | MapFilter | NumberFilter | SearchFilter | TimeFilter | GeoFilter | QuantityFilter;
 };
 
 // Extension : a date filter
@@ -146,6 +146,17 @@ export interface GeoFilter {
   wkt: string;
   // metres, for "withinDistance"
   distance?: number | undefined;
+}
+
+// Extension : a filter of the QUDT widget, see QuantityCriteria
+export interface QuantityFilter {
+  type: "quantityFilter";
+  // "=", "!=", "<", "<=", ">", ">=" or "between"
+  operator: string;
+  value: number;
+  value2?: number | undefined;
+  // QUDT unit IRI
+  unit: string;
 }
 
 /***** End BGP-same-subject extension of Sparnatural *****/

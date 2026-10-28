@@ -1,9 +1,12 @@
 import { NoWidget } from "../components/widgets/NoWidget";
 import { AbstractWidget } from "../components/widgets/AbstractWidget";
 import { WidgetBuildContext, WidgetRegistry } from "./SemanticRegistry";
-import { GEOSPARQL_PATTERN, OWL_TIME_PATTERN, SemanticPatternRegistry } from "./SemanticPatterns";
+import { GEOSPARQL_PATTERN, OWL_TIME_PATTERN, QUANTITY_PATTERN, SemanticPatternRegistry } from "./SemanticPatterns";
 import { OwlTimeWidget } from "./time/OwlTimeWidget";
 import { GeoSparqlWidget } from "./geo/GeoSparqlWidget";
+import { QuantityWidget } from "./quantity/QuantityWidget";
+import { Config } from "../ontologies/SparnaturalConfig";
+import { QUDT } from "./SemanticVocabulary";
 
 const WIDGETS: { [widget: string]: (ctx: WidgetBuildContext) => AbstractWidget } = {
   [OWL_TIME_PATTERN.widget]: (ctx) =>
@@ -16,6 +19,19 @@ const WIDGETS: { [widget: string]: (ctx: WidgetBuildContext) => AbstractWidget }
       ctx.objectPropVal,
       ctx.endClassVal,
     ),
+  [QUANTITY_PATTERN.widget]: (ctx) => {
+    const property = ctx.specProvider.getProperty(ctx.objectPropVal.type);
+    return new QuantityWidget(
+      {
+        quantityKinds: property.getConfigValues(`${QUDT}hasQuantityKind`),
+        defaultUnit: property.getConfigValues(Config.DEFAULT_UNIT)[0],
+      },
+      ctx.parentComponent,
+      ctx.startClassVal,
+      ctx.objectPropVal,
+      ctx.endClassVal,
+    );
+  },
 };
 
 /**
