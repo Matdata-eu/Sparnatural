@@ -64,6 +64,10 @@ and undatedGathering (no time).
 | `sfCrosses` the Pentagon polygon | northSouthJunction |
 | `sfWithin` box `POLYGON((4.33 50.83, 4.40 50.83, 4.40 50.86, 4.33 50.86, 4.33 50.83))` | grandPlace, royalPalace, midiStation, pentagon, northSouthJunction, cinquantenaire, parcDuCinquantenaire |
 
+`src/__tests__/semantic/GeoSparql.test.ts` runs these queries with Comunica,
+which has no GeoSPARQL functions: the test plugs in a small planar implementation
+of the `geof:` functions it needs (`GeoTestFunctions.ts`).
+
 Edge cases: atomium is 5.41 km away, just outside the 5 km radius.
 antwerpCathedral is about 42 km away. cinquantenaire uses an EPSG:4326 CRS
 IRI with latitude-longitude order. parcDuCinquantenaire has a default

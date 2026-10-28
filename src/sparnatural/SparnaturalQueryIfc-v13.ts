@@ -83,7 +83,7 @@ export type ObjectCriteria = {
 export type LabelledFilter = {
   type: "labelledFilter";
   label: string;
-  filter: DateFilter | MapFilter | NumberFilter | SearchFilter | TimeFilter;
+  filter: DateFilter | MapFilter | NumberFilter | SearchFilter | TimeFilter | GeoFilter;
 };
 
 // Extension : a date filter
@@ -135,6 +135,17 @@ export interface TimeFilter {
   granularity: "year" | "month" | "day" | "minute";
   start: string;
   stop?: string | undefined;
+}
+
+// Extension : a filter of the GeoSPARQL widget, see GeoCriteria
+export interface GeoFilter {
+  type: "geoFilter";
+  // e.g. "sfWithin", "sfIntersects", "withinDistance"
+  relation: string;
+  // WKT, longitude-latitude (CRS84)
+  wkt: string;
+  // metres, for "withinDistance"
+  distance?: number | undefined;
 }
 
 /***** End BGP-same-subject extension of Sparnatural *****/

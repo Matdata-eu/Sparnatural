@@ -79,9 +79,15 @@ export function toSparql(specProvider: any, query: SparnaturalQuery): string {
 /**
  * @returns the local names of the subjects, and the values of ?o, found by the query
  */
-export async function run(store: Store, sparql: string): Promise<{ s: string[]; rows: { s: string; o?: string }[] }> {
+export async function run(
+  store: Store,
+  sparql: string,
+  extensionFunctions?: { [iri: string]: (args: any[]) => Promise<any> },
+): Promise<{ s: string[]; rows: { s: string; o?: string }[] }> {
   const engine = new QueryEngine();
-  const bindings = await (await engine.queryBindings(sparql, { sources: [store] })).toArray();
+  const context: any = { sources: [store] };
+  if (extensionFunctions) context.extensionFunctions = extensionFunctions;
+  const bindings = await (await engine.queryBindings(sparql, context)).toArray();
   const local = (iri: string) => iri.substring(DATA_NS.length);
   const rows = bindings.map((b) => ({ s: local(b.get("s")!.value), o: b.get("o")?.value }));
   return { s: [...new Set(rows.map((r) => r.s))].sort(), rows };

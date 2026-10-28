@@ -1,12 +1,21 @@
 import { NoWidget } from "../components/widgets/NoWidget";
 import { AbstractWidget } from "../components/widgets/AbstractWidget";
 import { WidgetBuildContext, WidgetRegistry } from "./SemanticRegistry";
-import { OWL_TIME_PATTERN, SemanticPatternRegistry } from "./SemanticPatterns";
+import { GEOSPARQL_PATTERN, OWL_TIME_PATTERN, SemanticPatternRegistry } from "./SemanticPatterns";
 import { OwlTimeWidget } from "./time/OwlTimeWidget";
+import { GeoSparqlWidget } from "./geo/GeoSparqlWidget";
 
 const WIDGETS: { [widget: string]: (ctx: WidgetBuildContext) => AbstractWidget } = {
   [OWL_TIME_PATTERN.widget]: (ctx) =>
     new OwlTimeWidget(ctx.parentComponent, ctx.startClassVal, ctx.objectPropVal, ctx.endClassVal),
+  [GEOSPARQL_PATTERN.widget]: (ctx) =>
+    new GeoSparqlWidget(
+      ctx.settings?.customization?.map ?? {},
+      ctx.parentComponent,
+      ctx.startClassVal,
+      ctx.objectPropVal,
+      ctx.endClassVal,
+    ),
 };
 
 /**
