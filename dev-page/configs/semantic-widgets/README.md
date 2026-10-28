@@ -15,7 +15,9 @@ then follows the value path to the literal on its own.
 are marked `proposed` and arrive with the widget implementation.
 
 The expected results below are the reference for the widget tests. The time
-and QUDT rows were checked by running SPARQL 1.1 queries over `data.ttl`. The
+and QUDT rows were checked by running SPARQL 1.1 queries over `data.ttl` with
+rdflib. Two exceptions were checked by hand: the `DateTimeDescription` events
+(marked \*) and foundationOfRome, because rdflib cannot cast BC dates. The
 geometry rows were checked with Shapely and a haversine distance.
 
 ## OWL-Time
