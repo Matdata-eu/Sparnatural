@@ -20,7 +20,9 @@ import ISpecificationProperty from "../../../../../spec-providers/ISpecification
 import { IDatasource } from "../../../../../spec-providers/IDatasource";
 import { Catalog, RDFS, SKOS, SparqlHandlerFactory, SparqlHandlerIfc } from "rdf-shacl-commons";
 import { WidgetRegistry } from "../../../../../semantic/SemanticRegistry";
-import "../../../../../semantic/registerSemanticWidgets";
+import { registerSemanticWidgets } from "../../../../../semantic/registerSemanticWidgets";
+
+registerSemanticWidgets();
 
 /**
  * Inversion of coupling : we don't want to depend on ISettings as this class is meant to be reused
