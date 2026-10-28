@@ -8,6 +8,7 @@ import {
   MapCriteria,
   NumberCriteria,
   SearchCriteria,
+  TimeCriteria,
   VariableExpression,
 } from "../SparnaturalQueryIfc";
 
@@ -25,6 +26,7 @@ import {
   MapFilter,
   NumberFilter,
   SearchFilter,
+  TimeFilter,
 } from "../SparnaturalQueryIfc-v13";
 
 // A generic mapper type
@@ -176,6 +178,17 @@ const filterToCriteriaMap: Record<
     return { search: f.search };
   },
 
+  timeFilter: (lf) => {
+    const f = lf.filter as TimeFilter;
+    const c: TimeCriteria = {
+      timeRelation: f.relation,
+      granularity: f.granularity,
+      start: f.start,
+    };
+    if (f.stop !== undefined) c.stop = f.stop;
+    return c;
+  },
+
   mapFilter: (lf) => {
     const f = lf.filter as MapFilter;
     return {
@@ -223,6 +236,21 @@ const criteriaToFilterRegistry: Array<{
   match: (c: Criteria) => boolean;
   build: (label: string, c: Criteria) => LabelledFilter;
 }> = [
+  // before DateCriteria, which also has a start
+  {
+    match: (c): c is TimeCriteria => "timeRelation" in c,
+    build: (label, c) => {
+      const tc = c as TimeCriteria;
+      const filter: TimeFilter = {
+        type: "timeFilter",
+        relation: tc.timeRelation,
+        granularity: tc.granularity,
+        start: tc.start,
+      };
+      if (tc.stop !== undefined) filter.stop = tc.stop;
+      return { type: "labelledFilter", label, filter };
+    },
+  },
   {
     match: (c): c is DateCriteria => "start" in c || "stop" in c,
     build: (label, c) => ({

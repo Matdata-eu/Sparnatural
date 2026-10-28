@@ -177,3 +177,85 @@
 .jstree-anchor .item-link:hover {
     opacity: 1;
 }
+
+// OWL-Time widget
+.owltime-widget {
+    display: grid;
+    gap: 8px;
+    // the WidgetWrapper sets a line height for one-line widgets
+    line-height: 1.3;
+    text-align: left;
+
+    .owltime-relations { display: grid; gap: 2px; }
+    .owltime-relation {
+        display: grid;
+        grid-template-columns: 16px 120px 1fr;
+        gap: 8px;
+        align-items: center;
+        padding: 3px 8px;
+        border-radius: 6px;
+        cursor: pointer;
+        font-weight: normal;
+        margin: 0;
+        &:hover { background: var(--silver-color-light); }
+        &.on { background: var(--primary-color-light); }
+        input { margin: 0; }
+    }
+    .owltime-name { display: block; }
+    .owltime-owl { display: block; font-family: monospace; font-size: 0.8em; opacity: 0.7; }
+    .owltime-diagram {
+        width: 120px;
+        height: 22px;
+        .owltime-ref { fill: var(--silver-color-main); }
+        .owltime-val { fill: var(--primary-color-main); }
+    }
+    .owltime-sub {
+        font-size: 0.75em;
+        text-transform: uppercase;
+        letter-spacing: 0.06em;
+        opacity: 0.7;
+        margin: 6px 0 2px 8px;
+    }
+    .owltime-link {
+        background: none;
+        border: 0;
+        padding: 0 8px;
+        text-decoration: underline;
+        cursor: pointer;
+        color: inherit;
+        font-size: 0.9em;
+    }
+    .owltime-row {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+        align-items: center;
+    }
+    .owltime-seg {
+        display: inline-flex;
+        border: 1px solid #ccc;
+        border-radius: 6px;
+        overflow: hidden;
+        button {
+            background: #fff;
+            border: 0;
+            border-right: 1px solid #ccc;
+            padding: 4px 10px;
+            cursor: pointer;
+            color: inherit;
+            &:last-child { border-right: 0; }
+            &[aria-pressed="true"] { background: var(--primary-color-light); font-weight: bold; }
+        }
+    }
+    .owltime-inputs input {
+        height: 2.2em;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+        box-shadow: 0 1px 2px rgba(0,0,0,0.1) inset;
+        color: #555;
+        padding: 0 6px;
+        &[type="number"] { width: 7em; }
+    }
+    .owltime-hint { font-size: 0.85em; opacity: 0.7; }
+    .owltime-error { color: var(--secondary-color-important); font-size: 0.9em; &:empty { display: none; } }
+}

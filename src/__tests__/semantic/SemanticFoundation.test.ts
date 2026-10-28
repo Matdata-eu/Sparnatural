@@ -42,8 +42,8 @@ describe("semantic widgets foundation", () => {
     const byEvent = Object.fromEntries(rows.map((r) => [r.s, r.o]));
     expect(byEvent["treatySigned"]).toBe("2020-03-15");
     expect(byEvent["coronation"]).toBe("2020");
-    // interval: its beginning
-    expect(byEvent["winterFestival"]).toBe("2019-11-01");
+    // interval: begin/end, as an ISO 8601 interval
+    expect(byEvent["winterFestival"]).toBe("2019-11-01/2020-02-29");
     // no supported value: the event is still there, without a value
     expect(Object.keys(byEvent)).toContain("iceAgePeak");
     expect(byEvent["iceAgePeak"]).toBeUndefined();

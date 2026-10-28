@@ -1,6 +1,11 @@
 import { WidgetRegistry } from "./SemanticRegistry";
-import { SemanticPatternRegistry } from "./SemanticPatterns";
-import { ValuePathValueBuilder } from "./SemanticValueBuilder";
+import { OWL_TIME_PATTERN, SemanticPatternRegistry } from "./SemanticPatterns";
+import { SemanticValueBuilder, ValuePathValueBuilder } from "./SemanticValueBuilder";
+import { OwlTimeValueBuilder } from "./time/OwlTimeValueBuilder";
+
+const BUILDERS: { [widget: string]: () => SemanticValueBuilder } = {
+  [OWL_TIME_PATTERN.widget]: () => new OwlTimeValueBuilder(OWL_TIME_PATTERN),
+};
 
 /**
  * Registers how each semantic widget translates to SPARQL. Called by the SPARQL
@@ -11,7 +16,7 @@ export function registerSemanticValueBuilders() {
   SemanticPatternRegistry.patterns.forEach((pattern) => {
     WidgetRegistry.registerValueBuilder(
       pattern.widget,
-      () => new ValuePathValueBuilder(pattern),
+      BUILDERS[pattern.widget] ?? (() => new ValuePathValueBuilder(pattern)),
     );
   });
 }

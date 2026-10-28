@@ -26,12 +26,15 @@ const TIME_INSTANT_VALUE =
   `<${TIME}inXSDDateTimeStamp>|<${TIME}inXSDDateTime>|<${TIME}inXSDDate>` +
   `|<${TIME}inXSDgYearMonth>|<${TIME}inXSDgYear>`;
 
-// an Instant is its own beginning, an Interval goes through time:hasBeginning
-const TIME_BEGIN_VALUE = `<${TIME}hasBeginning>?/(${TIME_INSTANT_VALUE})`;
+// an Instant is its own beginning, an Interval goes through time:hasBeginning.
+// "(p/x)|x" rather than "p?/x": same meaning, and some engines (Comunica 4) lose the
+// zero-length matches of "?"
+const TIME_BEGIN_VALUE = `(<${TIME}hasBeginning>/(${TIME_INSTANT_VALUE}))|${TIME_INSTANT_VALUE}`;
 
 const WKT = `<${GSP}asWKT>`;
 
-const QUANTITY_VALUE = `<${QUDT}quantityValue>?/(<${QUDT}numericValue>|<${QUDT}value>)`;
+const NUMERIC_VALUE = `<${QUDT}numericValue>|<${QUDT}value>`;
+const QUANTITY_VALUE = `(<${QUDT}quantityValue>/(${NUMERIC_VALUE}))|${NUMERIC_VALUE}`;
 
 export const OWL_TIME_PATTERN: SemanticPattern = {
   specialEntity: "http://special/Z_Time",

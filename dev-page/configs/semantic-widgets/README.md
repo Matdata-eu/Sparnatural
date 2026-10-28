@@ -26,7 +26,7 @@ Reference period: the year 2020, i.e. `[2020-01-01T00:00:00Z, 2021-01-01T00:00:0
 
 | Relation | Expected events |
 | --- | --- |
-| within (`time:intervalIn`) | coronation, culturalCapitalYear, europeDay\*, firstBroadcast, harbourOpening, marchCampaign\*, springSeason, summerSchool, treatySigned |
+| within (inclusive: during, starts, finishes or equals) | coronation, culturalCapitalYear, europeDay\*, firstBroadcast, harbourOpening, marchCampaign\*, springSeason, summerSchool, treatySigned |
 | intersects | the "within" list + renovationCampaign, restorationProject, touringExhibition, winterFestival |
 | before (`time:before`) | decadeReview, foundationOfRome, satelliteLaunch |
 | after (`time:after`) | censusDay |
@@ -42,6 +42,12 @@ Reference period: the year 2020, i.e. `[2020-01-01T00:00:00Z, 2021-01-01T00:00:0
 | `time:intervalFinishes` | harbourOpening |
 | `time:intervalFinishedBy` | none |
 | `time:intervalEquals` | coronation, culturalCapitalYear |
+| `time:intervalAfter` | none |
+| `time:intervalIn` (within, but not equal) | europeDay\*, firstBroadcast, harbourOpening, marchCampaign\*, springSeason, summerSchool, treatySigned |
+| `time:intervalDisjoint` | censusDay, decadeReview, foundationOfRome, satelliteLaunch |
+
+The tests in `src/__tests__/semantic/OwlTime.test.ts` run these queries with
+Comunica, which cannot compare BC dates: foundationOfRome is left out there.
 
 Never matched by any time filter: iceAgePeak (`time:inTimePosition`, deferred)
 and undatedGathering (no time).

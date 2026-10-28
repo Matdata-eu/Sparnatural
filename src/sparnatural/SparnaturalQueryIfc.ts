@@ -71,7 +71,8 @@ export type Criteria =
   BooleanCriteria | 
   MapCriteria | 
   NumberCriteria | 
-  SearchCriteria;
+  SearchCriteria |
+  TimeCriteria;
 
 export interface RdfTermCriteria {
   rdfTerm: RDFTerm;
@@ -85,6 +86,21 @@ export interface DateCriteria {
   start?: string | undefined;
   stop?: string | undefined;
 };
+
+/**
+ * A criteria of the OWL-Time widget: the time of the value (an instant or an interval)
+ * is in the given relation with a reference period.
+ * The reference period goes from the start of "start" to the end of "stop" (or of
+ * "start" when there is no "stop"), each read at the given granularity.
+ */
+export interface TimeCriteria {
+  // a relation id, see TimeRelations, e.g. "within", "intersects", "intervalMeets"
+  timeRelation: string;
+  granularity: "year" | "month" | "day" | "minute";
+  // "2020", "-0752", "2020-03", "2020-03-15" or "2020-03-15T10:30", depending on granularity
+  start: string;
+  stop?: string | undefined;
+}
 
 export interface BooleanCriteria {
    boolean: boolean;
@@ -173,7 +189,8 @@ export enum CriteriaType {
   BooleanCriteria = "BooleanCriteria",
   MapCriteria = "MapCriteria",
   NumberCriteria = "NumberCriteria",
-  SearchCriteria = "SearchCriteria"
+  SearchCriteria = "SearchCriteria",
+  TimeCriteria = "TimeCriteria"
 }
 
 /**
@@ -184,6 +201,8 @@ export enum CriteriaType {
 export function getCriteriaType(value: Criteria): CriteriaType | undefined {
   if (typeof value === "object" && value !== null) {
     if ("rdfTerm" in value) return CriteriaType.RdfTermCriteria;
+    // before DateCriteria, which also has a start
+    if ("timeRelation" in value) return CriteriaType.TimeCriteria;
     if ("coordinates" in value) return CriteriaType.MapCriteria;
     if ("start" in value || "stop" in value) return CriteriaType.DateCriteria;
     if ("boolean" in value) return CriteriaType.BooleanCriteria;
@@ -244,6 +263,16 @@ export function equalsCriteria(v1: Criteria, v2: Criteria): boolean {
     }
     case CriteriaType.SearchCriteria:
       return (v1 as SearchCriteria).search === (v2 as SearchCriteria).search;
+    case CriteriaType.TimeCriteria: {
+      const t1 = v1 as TimeCriteria;
+      const t2 = v2 as TimeCriteria;
+      return (
+        t1.timeRelation === t2.timeRelation &&
+        t1.granularity === t2.granularity &&
+        t1.start === t2.start &&
+        (t1.stop ?? undefined) === (t2.stop ?? undefined)
+      );
+    }
     default:
       return false;
   }
