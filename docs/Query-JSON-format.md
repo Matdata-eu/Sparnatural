@@ -478,6 +478,46 @@ Filters are used for widgets that generate SPARQL FILTER clauses (date, number, 
 }
 ```
 
+**Time filter** (OWL-Time widget). `relation` is one of `within`, `intersects`, `before`, `after`, `intervalBefore`, `intervalMeets`, `intervalOverlaps`, `intervalStarts`, `intervalDuring`, `intervalFinishes`, `intervalEquals`, `intervalFinishedBy`, `intervalContains`, `intervalStartedBy`, `intervalOverlappedBy`, `intervalMetBy`, `intervalAfter`, `intervalIn` or `intervalDisjoint`. `granularity` is `year`, `month`, `day` or `minute`, and `start` and `stop` are written at that granularity. `stop` is optional: without it, the reference period is `start`.
+
+```json
+{
+  "filter": {
+    "type": "timeFilter",
+    "relation": "intersects",
+    "granularity": "month",
+    "start": "2020-03",
+    "stop": "2020-06"
+  }
+}
+```
+
+**Geo filter** (GeoSPARQL widget). `relation` is one of `sfWithin`, `sfIntersects`, `sfContains`, `sfDisjoint`, `sfTouches`, `sfOverlaps`, `sfCrosses`, `sfEquals` or `withinDistance`. `wkt` is in longitude-latitude order. `distance` is in metres and only used with `withinDistance`.
+
+```json
+{
+  "filter": {
+    "type": "geoFilter",
+    "relation": "withinDistance",
+    "wkt": "POINT(4.3522 50.8467)",
+    "distance": 5000
+  }
+}
+```
+
+**Quantity filter** (QUDT widget). `operator` is one of `=`, `!=`, `<`, `<=`, `>`, `>=` or `between`. `value2` is the upper bound of `between`. `unit` is a QUDT unit IRI.
+
+```json
+{
+  "filter": {
+    "type": "quantityFilter",
+    "operator": ">=",
+    "value": 2,
+    "unit": "http://qudt.org/vocab/unit/KiloGM"
+  }
+}
+```
+
 ### Aggregated variables
 
 If the query has aggregated variables (such as `COUNT(?x)`), the variable structure uses a `PatternBind`:
