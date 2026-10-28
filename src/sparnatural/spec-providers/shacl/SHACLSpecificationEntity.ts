@@ -8,6 +8,8 @@ import { DagIfc, Dag } from "../../dag/Dag";
 import { ISpecificationEntity } from "../ISpecificationEntity";
 import ISpecificationProperty from "../ISpecificationProperty";
 import { Term } from '@rdfjs/types';
+import { SemanticPatternRegistry } from '../../semantic/SemanticPatterns';
+import { DASH_SEARCH_WIDGET } from '../../semantic/SemanticVocabulary';
 import { GEOSPARQL, Model, NodeShape, PropertyShape, RDF, RDFS, SH, XSD, DatatypeRegistry, SPARNATURAL } from 'rdf-shacl-commons';
 
 const factory = new DataFactory();
@@ -446,6 +448,27 @@ export class SpecialSHACLSpecificationEntityRegistry {
                 SPARNATURAL.NUMBER_PROPERTY.value
             )
         )
+
+        // OWL-Time, GeoSPARQL and QUDT intermediate nodes, when referred to with sh:class
+        // and not described by a NodeShape of the configuration
+        SemanticPatternRegistry.patterns.forEach(pattern => {
+            this.registry.set(
+                pattern.specialEntity,
+                new SpecialSHACLSpecificationEntity(
+                    pattern.specialEntity,
+                    pattern.icon,
+                    pattern.label,
+                    function(n3store:RdfStore, shapeUri:any):boolean {
+                        let graph:Model = new Model(n3store);
+                        let shape = factory.namedNode(shapeUri);
+                        let classes = graph.readProperty(shape, SH.CLASS).map(t => t.value);
+                        let widget = graph.readSingleProperty(shape, factory.namedNode(DASH_SEARCH_WIDGET))?.value;
+                        return SemanticPatternRegistry.find(classes, widget) === pattern;
+                    },
+                    pattern.widget
+                )
+            )
+        });
     }
 
     /**

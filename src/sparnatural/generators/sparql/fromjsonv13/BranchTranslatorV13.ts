@@ -181,7 +181,7 @@ export default class BranchTranslatorV13 {
   }
 
   #buildValuePtrn() {
-    if (this.#hasValues) {
+    if (this.#hasValues || this.#valueBuilder?.alwaysBuild?.()) {
       this.#valuePtrns = this.#valueBuilder.build();
     }
   }

@@ -43,5 +43,15 @@ interface ISpecificationProperty extends ISpecificationEntry {
    * @returns true if the property has its range defined as a qualified value shape
    */
   hasQualifiedValueShapeRange(): boolean;
+
+  /**
+   * @returns the core:valuePath of the property rendered as a SPARQL property path, or undefined if not set
+   */
+  getValuePath(): string | undefined;
+
+  /**
+   * @returns the values of the given annotation on the property, e.g. its sh:class
+   */
+  getConfigValues(predicate: string): string[];
 }
 export default ISpecificationProperty;

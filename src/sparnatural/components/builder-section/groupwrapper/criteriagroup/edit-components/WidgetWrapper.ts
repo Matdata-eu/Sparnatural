@@ -12,6 +12,7 @@ import EditComponents from "./EditComponents";
 import { WidgetFactory } from "./WidgetFactory";
 import { QueryPatternBuilder } from "../../../../../generators/sparql/QueryPatternBuilder";
 import { QueryPattern } from "../../../../datasources/SparqlDataProviders";
+import { WidgetRegistry } from "../../../../../semantic/SemanticRegistry";
 
 
 /**
@@ -136,6 +137,9 @@ class WidgetWrapper extends HTMLComponent {
   }
 
   #getEndLabel(widgetType: string) {
+    let registered = WidgetRegistry.getEndLabel(widgetType);
+    if (registered !== undefined) return registered;
+
     if (
       widgetType == Config.SEARCH_PROPERTY ||
       widgetType == Config.STRING_EQUALS_PROPERTY ||

@@ -19,6 +19,7 @@ import ISpecificationProperty from "../../spec-providers/ISpecificationProperty"
 import { SHACLSpecificationEntity } from "../../spec-providers/shacl/SHACLSpecificationEntity";
 import { DateCriteria, RDFTerm, RdfTermCriteria, Criteria, BooleanCriteria, NumberCriteria, SearchCriteria, MapCriteria } from "../../SparnaturalQueryIfc";
 import { GEOFUNCTIONS, GEOSPARQL } from "rdf-shacl-commons";
+import { WidgetRegistry } from "../../semantic/SemanticRegistry";
 
 const factory = new DataFactory();
 
@@ -28,6 +29,10 @@ const factory = new DataFactory();
  */
 export class ValueBuilderFactory {
   buildValueBuilder(widgetType: string): ValueBuilderIfc {
+    // widgets registered outside of this switch, e.g. the semantic widgets
+    let registered = WidgetRegistry.buildValueBuilder(widgetType);
+    if (registered) return registered;
+
     switch (widgetType) {
       case Config.LITERAL_LIST_PROPERTY:
       case Config.LIST_PROPERTY:
@@ -102,6 +107,12 @@ export default interface ValueBuilderIfc {
    * (e.g. in case of a single value for an object property, we can directly generate the triple with the value as an object)
    */
   isBlockingObjectProp(): boolean;
+
+  /**
+   * @returns true if build() must be called even when there are no values, because the
+   * builder generates the triples joining the subject and the object itself
+   */
+  alwaysBuild?(): boolean;
 }
 
 export abstract class BaseValueBuilder implements ValueBuilderIfc {
