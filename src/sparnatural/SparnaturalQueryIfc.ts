@@ -72,7 +72,8 @@ export type Criteria =
   MapCriteria | 
   NumberCriteria | 
   SearchCriteria |
-  TimeCriteria;
+  TimeCriteria |
+  GeoCriteria;
 
 export interface RdfTermCriteria {
   rdfTerm: RDFTerm;
@@ -100,6 +101,19 @@ export interface TimeCriteria {
   // "2020", "-0752", "2020-03", "2020-03-15" or "2020-03-15T10:30", depending on granularity
   start: string;
   stop?: string | undefined;
+}
+
+/**
+ * A criteria of the GeoSPARQL widget: the geometry of the value is in a Simple Features
+ * relation with a reference geometry, or within a distance of it.
+ */
+export interface GeoCriteria {
+  // a relation id, see GeoRelations: "sfWithin", "sfIntersects", ..., "withinDistance"
+  geoRelation: string;
+  // the reference geometry, as WKT in longitude-latitude order (CRS84)
+  wkt: string;
+  // metres, for "withinDistance"
+  distance?: number | undefined;
 }
 
 export interface BooleanCriteria {
@@ -190,7 +204,8 @@ export enum CriteriaType {
   MapCriteria = "MapCriteria",
   NumberCriteria = "NumberCriteria",
   SearchCriteria = "SearchCriteria",
-  TimeCriteria = "TimeCriteria"
+  TimeCriteria = "TimeCriteria",
+  GeoCriteria = "GeoCriteria"
 }
 
 /**
@@ -203,6 +218,7 @@ export function getCriteriaType(value: Criteria): CriteriaType | undefined {
     if ("rdfTerm" in value) return CriteriaType.RdfTermCriteria;
     // before DateCriteria, which also has a start
     if ("timeRelation" in value) return CriteriaType.TimeCriteria;
+    if ("geoRelation" in value) return CriteriaType.GeoCriteria;
     if ("coordinates" in value) return CriteriaType.MapCriteria;
     if ("start" in value || "stop" in value) return CriteriaType.DateCriteria;
     if ("boolean" in value) return CriteriaType.BooleanCriteria;
@@ -271,6 +287,15 @@ export function equalsCriteria(v1: Criteria, v2: Criteria): boolean {
         t1.granularity === t2.granularity &&
         t1.start === t2.start &&
         (t1.stop ?? undefined) === (t2.stop ?? undefined)
+      );
+    }
+    case CriteriaType.GeoCriteria: {
+      const g1 = v1 as GeoCriteria;
+      const g2 = v2 as GeoCriteria;
+      return (
+        g1.geoRelation === g2.geoRelation &&
+        g1.wkt === g2.wkt &&
+        (g1.distance ?? undefined) === (g2.distance ?? undefined)
       );
     }
     default:

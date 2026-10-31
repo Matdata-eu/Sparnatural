@@ -9,6 +9,7 @@ import {
   NumberCriteria,
   SearchCriteria,
   TimeCriteria,
+  GeoCriteria,
   VariableExpression,
 } from "../SparnaturalQueryIfc";
 
@@ -27,6 +28,7 @@ import {
   NumberFilter,
   SearchFilter,
   TimeFilter,
+  GeoFilter,
 } from "../SparnaturalQueryIfc-v13";
 
 // A generic mapper type
@@ -189,6 +191,13 @@ const filterToCriteriaMap: Record<
     return c;
   },
 
+  geoFilter: (lf) => {
+    const f = lf.filter as GeoFilter;
+    const c: GeoCriteria = { geoRelation: f.relation, wkt: f.wkt };
+    if (f.distance !== undefined) c.distance = f.distance;
+    return c;
+  },
+
   mapFilter: (lf) => {
     const f = lf.filter as MapFilter;
     return {
@@ -248,6 +257,15 @@ const criteriaToFilterRegistry: Array<{
         start: tc.start,
       };
       if (tc.stop !== undefined) filter.stop = tc.stop;
+      return { type: "labelledFilter", label, filter };
+    },
+  },
+  {
+    match: (c): c is GeoCriteria => "geoRelation" in c,
+    build: (label, c) => {
+      const gc = c as GeoCriteria;
+      const filter: GeoFilter = { type: "geoFilter", relation: gc.geoRelation, wkt: gc.wkt };
+      if (gc.distance !== undefined) filter.distance = gc.distance;
       return { type: "labelledFilter", label, filter };
     },
   },

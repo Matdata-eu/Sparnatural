@@ -259,3 +259,40 @@
     .owltime-hint { font-size: 0.85em; opacity: 0.7; }
     .owltime-error { color: var(--secondary-color-important); font-size: 0.9em; &:empty { display: none; } }
 }
+
+// GeoSPARQL widget
+.geosparql-widget {
+    display: grid;
+    gap: 8px;
+    line-height: 1.3;
+    text-align: left;
+
+    .geosparql-row, .geosparql-distance {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+        align-items: center;
+    }
+    select, input, textarea {
+        border: 1px solid #ccc;
+        border-radius: 4px;
+        box-shadow: 0 1px 2px rgba(0,0,0,0.1) inset;
+        color: #555;
+        padding: 4px 6px;
+    }
+    input[type="number"] { width: 7em; }
+    .geosparql-map {
+        z-index: 3;
+        height: 400px;
+        width: min(600px, 80vw);
+    }
+    .geosparql-wkt {
+        display: grid;
+        gap: 4px;
+        font-weight: normal;
+        margin: 0;
+        span { font-size: 0.85em; opacity: 0.75; }
+        textarea { font-family: monospace; font-size: 0.85em; width: min(600px, 80vw); }
+    }
+    .geosparql-error { color: var(--secondary-color-important); font-size: 0.9em; &:empty { display: none; } }
+}

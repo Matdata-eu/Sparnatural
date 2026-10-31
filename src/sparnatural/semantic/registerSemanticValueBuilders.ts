@@ -1,10 +1,12 @@
 import { WidgetRegistry } from "./SemanticRegistry";
-import { OWL_TIME_PATTERN, SemanticPatternRegistry } from "./SemanticPatterns";
+import { GEOSPARQL_PATTERN, OWL_TIME_PATTERN, SemanticPatternRegistry } from "./SemanticPatterns";
 import { SemanticValueBuilder, ValuePathValueBuilder } from "./SemanticValueBuilder";
 import { OwlTimeValueBuilder } from "./time/OwlTimeValueBuilder";
+import { GeoSparqlValueBuilder } from "./geo/GeoSparqlValueBuilder";
 
 const BUILDERS: { [widget: string]: () => SemanticValueBuilder } = {
   [OWL_TIME_PATTERN.widget]: () => new OwlTimeValueBuilder(OWL_TIME_PATTERN),
+  [GEOSPARQL_PATTERN.widget]: () => new GeoSparqlValueBuilder(GEOSPARQL_PATTERN),
 };
 
 /**
