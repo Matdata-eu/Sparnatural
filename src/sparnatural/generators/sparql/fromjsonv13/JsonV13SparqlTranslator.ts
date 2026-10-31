@@ -18,8 +18,12 @@ import QueryWhereTranslatorV13 from "./QueryWhereTranslatorV13";
 import { Model } from "rdf-shacl-commons";
 import { ISpecificationEntity } from "../../../spec-providers/ISpecificationEntity";
 import { SparnaturalQueryTraversal, SparnaturalQueryUtils } from "./SparnaturalQueryUtils";
+import { registerSemanticValueBuilders } from "../../../semantic/registerSemanticValueBuilders";
 
 const factory = new DataFactory();
+
+// registers the value builders of the semantic widgets, once ValueBuilder.ts is loaded
+registerSemanticValueBuilders();
 
 export class JsonV13SparqlTranslator {
 

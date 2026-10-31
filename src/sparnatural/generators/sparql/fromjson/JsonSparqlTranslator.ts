@@ -12,8 +12,12 @@ import SparqlFactory from "../SparqlFactory";
 import { DataFactory } from "rdf-data-factory";
 import QueryWhereTranslator from "./QueryWhereTranslator";
 import ISpecificationProperty from "../../../spec-providers/ISpecificationProperty";
+import { registerSemanticValueBuilders } from "../../../semantic/registerSemanticValueBuilders";
 
 const factory = new DataFactory();
+
+// registers the value builders of the semantic widgets, once ValueBuilder.ts is loaded
+registerSemanticValueBuilders();
 
 /**
  * Generates a Sparql query in the SparqlJs structure from the JSON query format of Sparnatural

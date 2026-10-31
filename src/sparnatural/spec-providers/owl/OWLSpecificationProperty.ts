@@ -196,6 +196,17 @@ export class OWLSpecificationProperty
     return false;
   }
 
+  // semantic widgets (OWL-Time, GeoSPARQL, QUDT) are configured with SHACL only
+  getValuePath(): string | undefined {
+    return undefined;
+  }
+
+  getConfigValues(predicate: string): string[] {
+    return this.graph
+      .readProperty(factory.namedNode(this.uri), factory.namedNode(predicate))
+      .map((t: any) => t.value);
+  }
+
   _isUnionClass(classNode: any) {
     return this.graph.hasProperty(classNode, OWL.UNION_OF);
   }

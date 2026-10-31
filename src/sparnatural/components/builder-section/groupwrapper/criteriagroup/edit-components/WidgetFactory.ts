@@ -19,6 +19,10 @@ import { SparqlListDataProvider, SparqlAutocompleDataProvider, SparqlTreeDataPro
 import ISpecificationProperty from "../../../../../spec-providers/ISpecificationProperty";
 import { IDatasource } from "../../../../../spec-providers/IDatasource";
 import { Catalog, RDFS, SKOS, SparqlHandlerFactory, SparqlHandlerIfc } from "rdf-shacl-commons";
+import { WidgetRegistry } from "../../../../../semantic/SemanticRegistry";
+import { registerSemanticWidgets } from "../../../../../semantic/registerSemanticWidgets";
+
+registerSemanticWidgets();
 
 /**
  * Inversion of coupling : we don't want to depend on ISettings as this class is meant to be reused
@@ -122,6 +126,19 @@ export class WidgetFactory {
 
         // read the widgetType from the config
         const widgetType = property.getPropertyType(endClassVal.type);
+
+        // widgets registered outside of this switch, e.g. the semantic widgets
+        let registered = WidgetRegistry.buildWidget(widgetType, {
+          parentComponent: this.parentComponent,
+          specProvider: this.specProvider,
+          settings: this.settings,
+          startClassVal: startClassVal,
+          objectPropVal: objectPropVal,
+          endClassVal: endClassVal,
+          sparqlHandlerFactory: this.sparqlHandlerFactory,
+          sparqlPostProcessor: this.sparqlPostProcessor,
+        });
+        if (registered) return registered;
 
         switch (widgetType) {
           case Config.LITERAL_LIST_PROPERTY:

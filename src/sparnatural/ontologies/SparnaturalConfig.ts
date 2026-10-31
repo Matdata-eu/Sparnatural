@@ -35,6 +35,12 @@ export enum Config {
     "TreeProperty",
   VIRTUOSO_SEARCH_PROPERTY = "http://data.sparna.fr/ontologies/sparnatural-config-core#" +
     "VirtuosoSearchProperty",
+  OWL_TIME_PROPERTY = "http://data.sparna.fr/ontologies/sparnatural-config-core#" +
+    "OwlTimeProperty",
+  GEOSPARQL_PROPERTY = "http://data.sparna.fr/ontologies/sparnatural-config-core#" +
+    "GeoSparqlProperty",
+  QUANTITY_PROPERTY = "http://data.sparna.fr/ontologies/sparnatural-config-core#" +
+    "QuantityProperty",
 
   SPARQL_STRING = "http://data.sparna.fr/ontologies/sparnatural-config-core#" +
     "sparqlString",
@@ -68,6 +74,16 @@ export enum Config {
     "beginDateProperty",
   END_DATE_PROPERTY = "http://data.sparna.fr/ontologies/sparnatural-config-core#" +
     "endDateProperty",
+  VALUE_PATH = "http://data.sparna.fr/ontologies/sparnatural-config-core#" +
+    "valuePath",
+  DEFAULT_UNIT = "http://data.sparna.fr/ontologies/sparnatural-config-core#" +
+    "defaultUnit",
+  UNIT_CONVERSION = "http://data.sparna.fr/ontologies/sparnatural-config-core#" +
+    "unitConversion",
+  UNIT_CONVERSION_CLIENT_SIDE = "http://data.sparna.fr/ontologies/sparnatural-config-core#" +
+    "ClientSide",
+  UNIT_CONVERSION_ENDPOINT = "http://data.sparna.fr/ontologies/sparnatural-config-core#" +
+    "Endpoint",
 
   SPARNATURAL_CLASS = "http://data.sparna.fr/ontologies/sparnatural-config-core#" +
     "SparnaturalClass",

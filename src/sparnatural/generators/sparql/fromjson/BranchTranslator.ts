@@ -152,7 +152,7 @@ export default class BranchTranslator {
   }
 
   #buildValuePtrn() {
-    if (this.#branch.line.criterias?.length > 0) {
+    if (this.#branch.line.criterias?.length > 0 || this.#valueBuilder?.alwaysBuild?.()) {
       this.#valuePtrns = this.#valueBuilder.build();
     }
   }

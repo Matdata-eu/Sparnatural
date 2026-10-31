@@ -12,6 +12,7 @@ import { Term } from "@rdfjs/types/data-model";
 import { SHACLSpecificationProvider } from "./SHACLSpecificationProvider";
 import { DatasourceReading } from "../DatasourceReading";
 import {
+  PropertyPath,
   DatatypeIfc,
   Model,
   PropertyShape,
@@ -24,6 +25,8 @@ import {
   XSD,
 } from "rdf-shacl-commons";
 import { Quad_Subject } from "n3";
+import { SemanticPatternRegistry } from "../../semantic/SemanticPatterns";
+import { DASH_SEARCH_WIDGET } from "../../semantic/SemanticVocabulary";
 
 const factory = new DataFactory();
 
@@ -86,6 +89,12 @@ export class SHACLSpecificationProperty
   }
 
   getPropertyType(range: string): string | undefined {
+    // a semantic pattern (OWL-Time, GeoSPARQL, QUDT) : explicit widget, or the pattern's own
+    let pattern = SemanticPatternRegistry.findBySpecialEntity(range);
+    if (pattern) {
+      return this.getConfigValues(DASH_SEARCH_WIDGET)[0] ?? pattern.widget;
+    }
+
     if(
       SpecialSHACLSpecificationEntityRegistry.getInstance().getRegistry().has(range)
       &&
@@ -398,6 +407,20 @@ export class SHACLSpecificationProperty
       }
     }
     return false;
+  }
+
+  getValuePath(): string | undefined {
+    let path = this.graph.readSingleProperty(
+      factory.namedNode(this.uri),
+      factory.namedNode(Config.VALUE_PATH),
+    );
+    return path ? new PropertyPath(path, this.graph).toSparql() : undefined;
+  }
+
+  getConfigValues(predicate: string): string[] {
+    return this.graph
+      .readProperty(factory.namedNode(this.uri), factory.namedNode(predicate))
+      .map((t) => t.value);
   }
 
   static compare(
