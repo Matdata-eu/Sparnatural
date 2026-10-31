@@ -98,6 +98,20 @@ module.exports = {
       },
     }),
     new HtmlWebpackPlugin({
+      filename: "dev-page/semantic-widgets.html",
+      template: __dirname + "/dev-page/semantic-widgets.html",
+      inject: false,
+      templateParameters: (compilation, assets) => {
+        const css = assets.css
+          .map((filePath) => `<link rel="stylesheet" href="${filePath}" />`)
+          .join("\n");
+        const js = assets.js
+          .map((filePath) => `<script src="${filePath}"></script>`)
+          .join("\n");
+        return { css, js };
+      },
+    }),
+    new HtmlWebpackPlugin({
       filename: "dev-page/form-page.html", // Utiliser un nom différent pour la nouvelle page
       template: __dirname + "/dev-page/form-page.html",
       inject: false,
@@ -122,7 +136,7 @@ module.exports = {
           from: __dirname + "/dev-page",
           to: __dirname + "/dist" + "/dev-page",
           globOptions: {
-            ignore: ["**/index.html", "**/form-page.html"], // Assure-toi de ne pas copier ces fichiers déjà générés
+            ignore: ["**/index.html", "**/form-page.html", "**/semantic-widgets.html"], // Assure-toi de ne pas copier ces fichiers déjà générés
           },
         },
       ],

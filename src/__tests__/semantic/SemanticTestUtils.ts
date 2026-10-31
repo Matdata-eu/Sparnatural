@@ -1,6 +1,6 @@
 import * as fs from "fs";
 import * as path from "path";
-import { Parser as N3Parser, Store } from "n3";
+import { DataFactory, Parser as N3Parser, Store } from "n3";
 import { Generator, SelectQuery } from "sparqljs";
 import { QueryEngine } from "@comunica/query-sparql-rdfjs-lite";
 import { JsonV13SparqlTranslator } from "../../sparnatural/generators/sparql/fromjsonv13/JsonV13SparqlTranslator";
@@ -18,9 +18,18 @@ export async function buildSpecProvider(configTtl?: string): Promise<any> {
   );
 }
 
+/**
+ * Loads the fixtures with their blank nodes replaced by IRIs: Comunica binds the blank
+ * nodes of intermediate results into the next patterns, where a blank node acts as a
+ * variable, so "?node time:hasEnd?/time:inXSDDate ?v" with ?node bound to a blank node
+ * would match any node. Triplestores do not do that.
+ */
 export function loadData(file = "data.ttl"): Store {
+  const skolem = (t: any) => (t.termType === "BlankNode" ? DataFactory.namedNode("urn:bnode:" + t.value) : t);
   const store = new Store();
-  store.addQuads(new N3Parser().parse(fs.readFileSync(path.join(FIXTURES, file), "utf-8")));
+  for (const q of new N3Parser().parse(fs.readFileSync(path.join(FIXTURES, file), "utf-8"))) {
+    store.addQuad(DataFactory.quad(skolem(q.subject), q.predicate, skolem(q.object)));
+  }
   return store;
 }
 

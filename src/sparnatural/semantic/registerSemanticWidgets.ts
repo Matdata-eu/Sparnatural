@@ -1,6 +1,13 @@
 import { NoWidget } from "../components/widgets/NoWidget";
-import { WidgetRegistry } from "./SemanticRegistry";
-import { SemanticPatternRegistry } from "./SemanticPatterns";
+import { AbstractWidget } from "../components/widgets/AbstractWidget";
+import { WidgetBuildContext, WidgetRegistry } from "./SemanticRegistry";
+import { OWL_TIME_PATTERN, SemanticPatternRegistry } from "./SemanticPatterns";
+import { OwlTimeWidget } from "./time/OwlTimeWidget";
+
+const WIDGETS: { [widget: string]: (ctx: WidgetBuildContext) => AbstractWidget } = {
+  [OWL_TIME_PATTERN.widget]: (ctx) =>
+    new OwlTimeWidget(ctx.parentComponent, ctx.startClassVal, ctx.objectPropVal, ctx.endClassVal),
+};
 
 /**
  * Registers the UI of each semantic widget. Called by the WidgetFactory module.
@@ -11,7 +18,7 @@ export function registerSemanticWidgets() {
   SemanticPatternRegistry.patterns.forEach((pattern) => {
     WidgetRegistry.registerWidget(
       pattern.widget,
-      (ctx) => new NoWidget(ctx.parentComponent),
+      WIDGETS[pattern.widget] ?? ((ctx) => new NoWidget(ctx.parentComponent)),
     );
   });
 }

@@ -83,7 +83,7 @@ export type ObjectCriteria = {
 export type LabelledFilter = {
   type: "labelledFilter";
   label: string;
-  filter: DateFilter | MapFilter | NumberFilter | SearchFilter;
+  filter: DateFilter | MapFilter | NumberFilter | SearchFilter | TimeFilter;
 };
 
 // Extension : a date filter
@@ -125,6 +125,16 @@ export interface SearchFilter {
   // this is interpreted as a regexp when using plain SPARQL queries
   // or as a fulltext search string when using a triplestore with fulltext search capabilities
   search: string;
+}
+
+// Extension : a filter of the OWL-Time widget, see TimeCriteria
+export interface TimeFilter {
+  type: "timeFilter";
+  // e.g. "within", "intersects", "before", "intervalMeets"
+  relation: string;
+  granularity: "year" | "month" | "day" | "minute";
+  start: string;
+  stop?: string | undefined;
 }
 
 /***** End BGP-same-subject extension of Sparnatural *****/
