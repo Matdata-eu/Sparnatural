@@ -1,0 +1,319 @@
+# Synthetic test dataset for the OWL-Time, GeoSPARQL and QUDT widgets.
+# Every resource exists to exercise one data pattern or edge case; the
+# comment above each one says which. Place names are real, coordinates are
+# approximate (WGS84 / CRS84, longitude latitude unless stated otherwise).
+
+@prefix ex: <https://example.org/sparnatural-test/> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix time: <http://www.w3.org/2006/time#> .
+@prefix gsp: <http://www.opengis.net/ont/geosparql#> .
+@prefix qudt: <http://qudt.org/schema/qudt/> .
+@prefix unit: <http://qudt.org/vocab/unit/> .
+@prefix quantitykind: <http://qudt.org/vocab/quantitykind/> .
+
+
+#################################################################
+# OWL-Time: events
+# Reference period used in the test queries: the year 2020,
+# normalised to [2020-01-01T00:00:00, 2021-01-01T00:00:00).
+#################################################################
+
+# Instant, xsd:gYear -> [2020-01-01, 2021-01-01): equals the year 2020
+ex:coronation a ex:Event ;
+  rdfs:label "Coronation"@en ;
+  ex:tookPlace [ a time:Instant ; time:inXSDgYear "2020"^^xsd:gYear ] .
+
+# Instant, xsd:date, inside 2020
+ex:treatySigned a ex:Event ;
+  rdfs:label "Treaty signed"@en ;
+  ex:tookPlace [ a time:Instant ; time:inXSDDate "2020-03-15"^^xsd:date ] .
+
+# Instant, xsd:dateTime without timezone, 30 minutes before 2020
+ex:satelliteLaunch a ex:Event ;
+  rdfs:label "Satellite launch"@en ;
+  ex:tookPlace [ a time:Instant ; time:inXSDDateTime "2019-12-31T23:30:00"^^xsd:dateTime ] .
+
+# Instant, xsd:dateTimeStamp (timezone mandatory), inside 2020
+ex:firstBroadcast a ex:Event ;
+  rdfs:label "First broadcast"@en ;
+  ex:tookPlace [ a time:Instant ; time:inXSDDateTimeStamp "2020-07-21T20:17:00Z"^^xsd:dateTimeStamp ] .
+
+# Instant, xsd:gYearMonth, last month of 2020: finishes the year 2020
+ex:harbourOpening a ex:Event ;
+  rdfs:label "Harbour opening"@en ;
+  ex:tookPlace [ a time:Instant ; time:inXSDgYearMonth "2020-12"^^xsd:gYearMonth ] .
+
+# Instant, xsd:date, first day after 2020: metBy the year 2020
+ex:censusDay a ex:Event ;
+  rdfs:label "Census day"@en ;
+  ex:tookPlace [ a time:Instant ; time:inXSDDate "2021-01-01"^^xsd:date ] .
+
+# Instant, negative xsd:gYear (BC), far before every reference period
+ex:foundationOfRome a ex:Event ;
+  rdfs:label "Foundation of Rome (traditional date)"@en ;
+  ex:tookPlace [ a time:Instant ; time:inXSDgYear "-0752"^^xsd:gYear ] .
+
+# Instant described with a DateTimeDescription (year + month + day),
+# equivalent to "2020-05-09"^^xsd:date
+ex:europeDay a ex:Event ;
+  rdfs:label "Europe Day ceremony"@en ;
+  ex:tookPlace [
+    a time:Instant ;
+    time:inDateTime [
+      a time:DateTimeDescription ;
+      time:unitType time:unitDay ;
+      time:year "2020"^^xsd:gYear ;
+      time:month "--05"^^xsd:gMonth ;
+      time:day "---09"^^xsd:gDay
+    ]
+  ] .
+
+# Instant with only a time:inTimePosition: support is deferred, so this
+# event must be silently ignored by time filters, never cause an error
+ex:iceAgePeak a ex:Event ;
+  rdfs:label "Last glacial maximum"@en ;
+  ex:tookPlace [
+    a time:Instant ;
+    time:inTimePosition [ a time:TimePosition ; time:numericPosition "-26000"^^xsd:decimal ]
+  ] .
+
+# ProperInterval, both ends xsd:date, overlaps the start of 2020
+ex:winterFestival a ex:Event ;
+  rdfs:label "Winter festival"@en ;
+  ex:tookPlace [
+    a time:ProperInterval ;
+    time:hasBeginning [ a time:Instant ; time:inXSDDate "2019-11-01"^^xsd:date ] ;
+    time:hasEnd [ a time:Instant ; time:inXSDDate "2020-02-29"^^xsd:date ]
+  ] .
+
+# ProperInterval, xsd:gYearMonth ends, overlaps the end of 2020
+ex:touringExhibition a ex:Event ;
+  rdfs:label "Touring exhibition"@en ;
+  ex:tookPlace [
+    a time:ProperInterval ;
+    time:hasBeginning [ a time:Instant ; time:inXSDgYearMonth "2020-06"^^xsd:gYearMonth ] ;
+    time:hasEnd [ a time:Instant ; time:inXSDgYearMonth "2021-03"^^xsd:gYearMonth ]
+  ] .
+
+# ProperInterval with mixed granularities (gYear begin, date end),
+# exactly the year 2020: intervalEquals the year 2020
+ex:culturalCapitalYear a ex:Event ;
+  rdfs:label "Cultural capital year"@en ;
+  ex:tookPlace [
+    a time:ProperInterval ;
+    time:hasBeginning [ a time:Instant ; time:inXSDgYear "2020"^^xsd:gYear ] ;
+    time:hasEnd [ a time:Instant ; time:inXSDDate "2020-12-31"^^xsd:date ]
+  ] .
+
+# ProperInterval that starts with 2020 and ends inside it: intervalStarts
+ex:springSeason a ex:Event ;
+  rdfs:label "Spring season"@en ;
+  ex:tookPlace [
+    a time:ProperInterval ;
+    time:hasBeginning [ a time:Instant ; time:inXSDDate "2020-01-01"^^xsd:date ] ;
+    time:hasEnd [ a time:Instant ; time:inXSDDate "2020-05-31"^^xsd:date ]
+  ] .
+
+# ProperInterval strictly inside 2020: intervalDuring
+ex:summerSchool a ex:Event ;
+  rdfs:label "Summer school"@en ;
+  ex:tookPlace [
+    a time:ProperInterval ;
+    time:hasBeginning [ a time:Instant ; time:inXSDDateTime "2020-07-06T09:00:00"^^xsd:dateTime ] ;
+    time:hasEnd [ a time:Instant ; time:inXSDDateTime "2020-07-17T17:00:00"^^xsd:dateTime ]
+  ] .
+
+# ProperInterval that contains 2020 on both sides: intervalContains
+ex:renovationCampaign a ex:Event ;
+  rdfs:label "Renovation campaign"@en ;
+  ex:tookPlace [
+    a time:ProperInterval ;
+    time:hasBeginning [ a time:Instant ; time:inXSDgYear "2018"^^xsd:gYear ] ;
+    time:hasEnd [ a time:Instant ; time:inXSDgYear "2022"^^xsd:gYear ]
+  ] .
+
+# ProperInterval that ends exactly when 2020 starts: intervalMeets
+ex:decadeReview a ex:Event ;
+  rdfs:label "Decade review"@en ;
+  ex:tookPlace [
+    a time:ProperInterval ;
+    time:hasBeginning [ a time:Instant ; time:inXSDgYear "2010"^^xsd:gYear ] ;
+    time:hasEnd [ a time:Instant ; time:inXSDgYear "2019"^^xsd:gYear ]
+  ] .
+
+# Open interval: hasBeginning only, still running
+ex:restorationProject a ex:Event ;
+  rdfs:label "Restoration project"@en ;
+  ex:tookPlace [
+    a time:ProperInterval ;
+    time:hasBeginning [ a time:Instant ; time:inXSDgYear "2018"^^xsd:gYear ]
+  ] .
+
+# DateTimeInterval: the whole of March 2020 given by one description
+ex:marchCampaign a ex:Event ;
+  rdfs:label "March awareness campaign"@en ;
+  ex:tookPlace [
+    a time:DateTimeInterval ;
+    time:hasDateTimeDescription [
+      a time:DateTimeDescription ;
+      time:unitType time:unitMonth ;
+      time:year "2020"^^xsd:gYear ;
+      time:month "--03"^^xsd:gMonth
+    ]
+  ] .
+
+# Event with no time at all: must disappear under any time criterion,
+# and show an empty cell when the time variable is only selected
+ex:undatedGathering a ex:Event ;
+  rdfs:label "Undated gathering"@en .
+
+
+#################################################################
+# GeoSPARQL: places
+#################################################################
+
+# Point feature
+ex:grandPlace a ex:Place, gsp:Feature ;
+  rdfs:label "Grand-Place"@en ;
+  gsp:hasGeometry [ a gsp:Geometry ; gsp:asWKT "POINT(4.3522 50.8467)"^^gsp:wktLiteral ] .
+
+ex:atomium a ex:Place, gsp:Feature ;
+  rdfs:label "Atomium"@en ;
+  gsp:hasGeometry [ a gsp:Geometry ; gsp:asWKT "POINT(4.3417 50.8949)"^^gsp:wktLiteral ] .
+
+ex:royalPalace a ex:Place, gsp:Feature ;
+  rdfs:label "Royal Palace"@en ;
+  gsp:hasGeometry [ a gsp:Geometry ; gsp:asWKT "POINT(4.3622 50.8417)"^^gsp:wktLiteral ] .
+
+ex:midiStation a ex:Place, gsp:Feature ;
+  rdfs:label "Brussels-Midi station"@en ;
+  gsp:hasGeometry [ a gsp:Geometry ; gsp:asWKT "POINT(4.3360 50.8357)"^^gsp:wktLiteral ] .
+
+# Point in Antwerp, about 41 km away: outside any "within 5 km of Brussels" query
+ex:antwerpCathedral a ex:Place, gsp:Feature ;
+  rdfs:label "Cathedral of Our Lady, Antwerp"@en ;
+  gsp:hasGeometry [ a gsp:Geometry ; gsp:asWKT "POINT(4.4005 51.2203)"^^gsp:wktLiteral ] .
+
+# Polygon feature (the inner ring road, simplified)
+ex:pentagon a ex:Place, gsp:Feature ;
+  rdfs:label "Pentagon (city centre)"@en ;
+  gsp:hasGeometry [
+    a gsp:Geometry ;
+    gsp:asWKT "POLYGON((4.3410 50.8550, 4.3600 50.8590, 4.3720 50.8530, 4.3680 50.8400, 4.3500 50.8350, 4.3380 50.8440, 4.3410 50.8550))"^^gsp:wktLiteral
+  ] .
+
+# Polygon feature south of the centre
+ex:boisDeLaCambre a ex:Place, gsp:Feature ;
+  rdfs:label "Bois de la Cambre"@en ;
+  gsp:hasGeometry [
+    a gsp:Geometry ;
+    gsp:asWKT "POLYGON((4.3720 50.8160, 4.3820 50.8170, 4.3850 50.8060, 4.3740 50.8050, 4.3720 50.8160))"^^gsp:wktLiteral
+  ] .
+
+# LineString feature crossing the Pentagon: sfIntersects and sfCrosses, not sfWithin
+ex:northSouthJunction a ex:Place, gsp:Feature ;
+  rdfs:label "North-South rail junction"@en ;
+  gsp:hasGeometry [
+    a gsp:Geometry ;
+    gsp:asWKT "LINESTRING(4.3600 50.8600, 4.3570 50.8460, 4.3360 50.8357)"^^gsp:wktLiteral
+  ] .
+
+# WKT with an explicit CRS IRI. EPSG:4326 uses latitude longitude order,
+# so the numbers are swapped compared to the CRS84 literals above.
+ex:cinquantenaire a ex:Place, gsp:Feature ;
+  rdfs:label "Cinquantenaire"@en ;
+  gsp:hasGeometry [
+    a gsp:Geometry ;
+    gsp:asWKT "<http://www.opengis.net/def/crs/EPSG/0/4326> POINT(50.8401 4.3927)"^^gsp:wktLiteral
+  ] .
+
+# Feature with a default geometry (point) and a second, detailed geometry
+# (polygon): gsp:Feature handling must prefer hasDefaultGeometry
+ex:parcDuCinquantenaire a ex:Place, gsp:Feature ;
+  rdfs:label "Parc du Cinquantenaire"@en ;
+  gsp:hasDefaultGeometry ex:parcDuCinquantenaire_point ;
+  gsp:hasGeometry ex:parcDuCinquantenaire_point, ex:parcDuCinquantenaire_area .
+ex:parcDuCinquantenaire_point a gsp:Geometry ;
+  gsp:asWKT "POINT(4.3895 50.8407)"^^gsp:wktLiteral .
+ex:parcDuCinquantenaire_area a gsp:Geometry ;
+  gsp:asWKT "POLYGON((4.3840 50.8430, 4.3960 50.8430, 4.3960 50.8385, 4.3840 50.8385, 4.3840 50.8430))"^^gsp:wktLiteral .
+
+# Geometry serialised only as GeoJSON: out of scope (asWKT only), so this
+# place must be ignored by spatial filters, never cause an error
+ex:placeFlagey a ex:Place, gsp:Feature ;
+  rdfs:label "Place Flagey"@en ;
+  gsp:hasGeometry [
+    a gsp:Geometry ;
+    gsp:asGeoJSON "{\"type\":\"Point\",\"coordinates\":[4.3722,50.8275]}"^^gsp:geoJSONLiteral
+  ] .
+
+# Place with no geometry at all
+ex:unknownVenue a ex:Place ;
+  rdfs:label "Unknown venue"@en .
+
+
+#################################################################
+# QUDT: samples
+# Reference query: mass >= 2 kg, storage temperature <= -18 °C.
+#################################################################
+
+# Standard pattern: qudt:numericValue + qudt:unit. 2500 g = 2.5 kg, matches
+ex:sampleA a ex:Sample ;
+  rdfs:label "Sample A"@en ;
+  ex:mass [ a qudt:QuantityValue ; qudt:numericValue "2500"^^xsd:decimal ; qudt:unit unit:GM ] ;
+  ex:storageTemperature [ a qudt:QuantityValue ; qudt:numericValue "-20"^^xsd:decimal ; qudt:unit unit:DEG_C ] .
+
+# 1.2 kg, below the 2 kg threshold. 4 °C, too warm
+ex:sampleB a ex:Sample ;
+  rdfs:label "Sample B"@en ;
+  ex:mass [ a qudt:QuantityValue ; qudt:numericValue "1.2"^^xsd:decimal ; qudt:unit unit:KiloGM ] ;
+  ex:storageTemperature [ a qudt:QuantityValue ; qudt:numericValue "4"^^xsd:decimal ; qudt:unit unit:DEG_C ] .
+
+# Imperial units. 5 lb = 2.268 kg, matches. 40 °F = 4.44 °C, too warm
+ex:sampleC a ex:Sample ;
+  rdfs:label "Sample C"@en ;
+  ex:mass [ a qudt:QuantityValue ; qudt:numericValue "5"^^xsd:decimal ; qudt:unit unit:LB ] ;
+  ex:storageTemperature [ a qudt:QuantityValue ; qudt:numericValue "40"^^xsd:decimal ; qudt:unit unit:DEG_F ] .
+
+# Older pattern: qudt:value + qudt:hasUnit, xsd:double.
+# 0.003 t = 3 kg, matches. 253.15 K = -20 °C, matches
+ex:sampleD a ex:Sample ;
+  rdfs:label "Sample D"@en ;
+  ex:mass [ a qudt:QuantityValue ; qudt:value "0.003"^^xsd:double ; qudt:hasUnit unit:TONNE ] ;
+  ex:storageTemperature [ a qudt:QuantityValue ; qudt:value "253.15"^^xsd:double ; qudt:hasUnit unit:K ] .
+
+# qudt:Quantity wrapping a QuantityValue, with its quantity kind on the data.
+# 1 800 000 mg = 1.8 kg, no match. -80 °C, matches
+ex:sampleE a ex:Sample ;
+  rdfs:label "Sample E"@en ;
+  ex:mass [
+    a qudt:Quantity ;
+    qudt:hasQuantityKind quantitykind:Mass ;
+    qudt:quantityValue [ a qudt:QuantityValue ; qudt:numericValue "1800000"^^xsd:integer ; qudt:unit unit:MilliGM ]
+  ] ;
+  ex:storageTemperature [ a qudt:QuantityValue ; qudt:numericValue "-80"^^xsd:decimal ; qudt:unit unit:DEG_C ] .
+
+# Exactly on the thresholds: 2 kg matches ">= 2 kg" and "= 2 kg".
+# 0 °F = -17.78 °C, just above -18 °C, no match: checks the conversion offset
+ex:sampleF a ex:Sample ;
+  rdfs:label "Sample F"@en ;
+  ex:mass [ a qudt:QuantityValue ; qudt:numericValue "2"^^xsd:decimal ; qudt:unit unit:KiloGM ] ;
+  ex:storageTemperature [ a qudt:QuantityValue ; qudt:numericValue "0"^^xsd:decimal ; qudt:unit unit:DEG_F ] .
+
+# Equality through a conversion with a long factor: 4.40924524 lb = 2 kg
+# (to 1e-9), must match "= 2 kg" thanks to the relative tolerance
+ex:sampleG a ex:Sample ;
+  rdfs:label "Sample G"@en ;
+  ex:mass [ a qudt:QuantityValue ; qudt:numericValue "4.409245243697551"^^xsd:double ; qudt:unit unit:LB ] .
+
+# Data error: a mass recorded in metres. Must never match a mass filter,
+# whatever the number, because metres are not a unit of quantitykind:Mass
+ex:sampleH a ex:Sample ;
+  rdfs:label "Sample H (unit error)"@en ;
+  ex:mass [ a qudt:QuantityValue ; qudt:numericValue "5000"^^xsd:decimal ; qudt:unit unit:M ] .
+
+# No mass, no temperature
+ex:sampleI a ex:Sample ;
+  rdfs:label "Sample I (not measured)"@en .
