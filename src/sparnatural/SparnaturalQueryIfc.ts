@@ -73,7 +73,8 @@ export type Criteria =
   NumberCriteria | 
   SearchCriteria |
   TimeCriteria |
-  GeoCriteria;
+  GeoCriteria |
+  QuantityCriteria;
 
 export interface RdfTermCriteria {
   rdfTerm: RDFTerm;
@@ -114,6 +115,20 @@ export interface GeoCriteria {
   wkt: string;
   // metres, for "withinDistance"
   distance?: number | undefined;
+}
+
+/**
+ * A criteria of the QUDT widget: the quantity, converted to the unit of the criteria,
+ * compares with the given value(s).
+ */
+export interface QuantityCriteria {
+  // "=", "!=", "<", "<=", ">", ">=" or "between"
+  quantityOperator: string;
+  value: number;
+  // upper bound, for "between"
+  value2?: number | undefined;
+  // the QUDT unit IRI the values are written in, e.g. http://qudt.org/vocab/unit/KiloGM
+  unit: string;
 }
 
 export interface BooleanCriteria {
@@ -205,7 +220,8 @@ export enum CriteriaType {
   NumberCriteria = "NumberCriteria",
   SearchCriteria = "SearchCriteria",
   TimeCriteria = "TimeCriteria",
-  GeoCriteria = "GeoCriteria"
+  GeoCriteria = "GeoCriteria",
+  QuantityCriteria = "QuantityCriteria"
 }
 
 /**
@@ -219,6 +235,7 @@ export function getCriteriaType(value: Criteria): CriteriaType | undefined {
     // before DateCriteria, which also has a start
     if ("timeRelation" in value) return CriteriaType.TimeCriteria;
     if ("geoRelation" in value) return CriteriaType.GeoCriteria;
+    if ("quantityOperator" in value) return CriteriaType.QuantityCriteria;
     if ("coordinates" in value) return CriteriaType.MapCriteria;
     if ("start" in value || "stop" in value) return CriteriaType.DateCriteria;
     if ("boolean" in value) return CriteriaType.BooleanCriteria;
@@ -296,6 +313,16 @@ export function equalsCriteria(v1: Criteria, v2: Criteria): boolean {
         g1.geoRelation === g2.geoRelation &&
         g1.wkt === g2.wkt &&
         (g1.distance ?? undefined) === (g2.distance ?? undefined)
+      );
+    }
+    case CriteriaType.QuantityCriteria: {
+      const q1 = v1 as QuantityCriteria;
+      const q2 = v2 as QuantityCriteria;
+      return (
+        q1.quantityOperator === q2.quantityOperator &&
+        q1.value === q2.value &&
+        (q1.value2 ?? undefined) === (q2.value2 ?? undefined) &&
+        q1.unit === q2.unit
       );
     }
     default:

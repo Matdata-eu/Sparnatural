@@ -10,6 +10,7 @@ import {
   SearchCriteria,
   TimeCriteria,
   GeoCriteria,
+  QuantityCriteria,
   VariableExpression,
 } from "../SparnaturalQueryIfc";
 
@@ -29,6 +30,7 @@ import {
   SearchFilter,
   TimeFilter,
   GeoFilter,
+  QuantityFilter,
 } from "../SparnaturalQueryIfc-v13";
 
 // A generic mapper type
@@ -198,6 +200,13 @@ const filterToCriteriaMap: Record<
     return c;
   },
 
+  quantityFilter: (lf) => {
+    const f = lf.filter as QuantityFilter;
+    const c: QuantityCriteria = { quantityOperator: f.operator, value: f.value, unit: f.unit };
+    if (f.value2 !== undefined) c.value2 = f.value2;
+    return c;
+  },
+
   mapFilter: (lf) => {
     const f = lf.filter as MapFilter;
     return {
@@ -266,6 +275,20 @@ const criteriaToFilterRegistry: Array<{
       const gc = c as GeoCriteria;
       const filter: GeoFilter = { type: "geoFilter", relation: gc.geoRelation, wkt: gc.wkt };
       if (gc.distance !== undefined) filter.distance = gc.distance;
+      return { type: "labelledFilter", label, filter };
+    },
+  },
+  {
+    match: (c): c is QuantityCriteria => "quantityOperator" in c,
+    build: (label, c) => {
+      const qc = c as QuantityCriteria;
+      const filter: QuantityFilter = {
+        type: "quantityFilter",
+        operator: qc.quantityOperator,
+        value: qc.value,
+        unit: qc.unit,
+      };
+      if (qc.value2 !== undefined) filter.value2 = qc.value2;
       return { type: "labelledFilter", label, filter };
     },
   },

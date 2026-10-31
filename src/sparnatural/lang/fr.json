@@ -118,5 +118,11 @@
   "GeoRelation.sfTouches": "touche le bord de",
   "GeoRelation.sfOverlaps": "chevauche",
   "GeoRelation.sfCrosses": "traverse",
-  "GeoRelation.sfEquals": "a la même forme que"
+  "GeoRelation.sfEquals": "a la même forme que",
+  "QuantityOperator": "Comparaison",
+  "QuantityValue": "Valeur",
+  "QuantityValue2": "Valeur haute",
+  "QuantityUnit": "Unité",
+  "QuantityInvalid": "Saisir une valeur.",
+  "QuantityInvalidRange": "Saisir deux valeurs, la première ne dépassant pas la seconde."
 }

@@ -57,12 +57,13 @@ describe("semantic widgets foundation", () => {
     expect(rows.find((r) => r.s === "grandPlace")?.o).toBe("POINT(4.3522 50.8467)");
   });
 
-  test("selecting the quantity variable returns the number, through qudt:Quantity too", async () => {
+  test("selecting the quantity variable returns the number, through qudt:Quantity too, in the default unit", async () => {
     const sparql = toSparql(spec, oneCriteriaQuery("Sample", "Sample_mass", QUANTITY_PATTERN.specialEntity));
     const { rows } = await run(loadData(), sparql);
     const bySample = Object.fromEntries(rows.map((r) => [r.s, r.o]));
-    expect(bySample["sampleA"]).toBe("2500");
-    expect(bySample["sampleE"]).toBe("1800000");
-    expect(bySample["sampleD"]).toBe("0.003");
+    // converted to the default unit of the property, kg
+    expect(bySample["sampleA"]).toBe("2.5");
+    expect(bySample["sampleE"]).toBe("1.8");
+    expect(bySample["sampleD"]).toBe("3");
   });
 });

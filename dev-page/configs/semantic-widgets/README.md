@@ -82,6 +82,12 @@ and unknownVenue has no geometry, so neither ever matches.
 | mass = 2 kg | sampleF, sampleG (equal within 1e-9 after conversion) |
 | storage temperature <= -18 °C | sampleA (-20 °C), sampleD (253.15 K), sampleE (-80 °C) |
 
+Conversion follows the QUDT 3 convention, value in SI = (value + conversionOffset) ×
+conversionMultiplier (`unit:DEG_F` has offset 459.67). The bundled unit table
+(`src/sparnatural/semantic/quantity/qudt-units.json`) is built from QUDT v3.5.3 by
+`node scripts/build-qudt-units.mjs v3.5.3`. The endpoint mode test loads the QUDT
+description of the temperature units from that table.
+
 Edge cases: sampleF at 0 °F is -17.78 °C, so it fails the temperature filter
 only if the conversion offset is applied. sampleH records a mass in metres
 and must never match. sampleD uses the older `qudt:value` and `qudt:hasUnit`.
