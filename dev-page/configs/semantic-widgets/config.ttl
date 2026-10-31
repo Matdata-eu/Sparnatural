@@ -5,8 +5,8 @@
 # gsp:Geometry, qudt:QuantityValue). The widget follows the value path to the
 # literal by itself. No NodeShape is declared for those intermediate classes.
 #
-# The terms marked "proposed" do not exist in sparnatural-config-core yet;
-# they are introduced by the semantic widgets work (see README.md).
+# core:OwlTimeProperty, core:defaultUnit and core:unitConversion are described in
+# ontologies/sparnatural-config-core.owl.
 
 @prefix this: <https://example.org/sparnatural-test/config/> .
 @prefix ex: <https://example.org/sparnatural-test/> .
@@ -53,7 +53,7 @@ this:Event_tookPlace a sh:PropertyShape ;
   sh:path ex:tookPlace ;
   sh:name "took place"@en, "a eu lieu"@fr ;
   sh:class time:TemporalEntity ;
-  dash:searchWidget core:OwlTimeProperty .     # proposed
+  dash:searchWidget core:OwlTimeProperty .
 
 
 # ---------------------------------------------------------------
@@ -108,8 +108,8 @@ this:Sample_mass a sh:PropertyShape ;
   sh:name "mass"@en, "masse"@fr ;
   sh:class qudt:QuantityValue ;
   qudt:hasQuantityKind quantitykind:Mass ;
-  core:defaultUnit unit:KiloGM ;               # proposed
-  core:unitConversion core:ClientSide .        # proposed
+  core:defaultUnit unit:KiloGM ;
+  core:unitConversion core:ClientSide .
 
 # Conversion factors read from the QUDT units graph loaded in the endpoint
 # (load the QUDT unit vocabulary alongside data.ttl to test this mode).
@@ -119,5 +119,5 @@ this:Sample_storageTemperature a sh:PropertyShape ;
   sh:name "storage temperature"@en, "température de stockage"@fr ;
   sh:class qudt:QuantityValue ;
   qudt:hasQuantityKind quantitykind:Temperature ;
-  core:defaultUnit unit:DEG_C ;                # proposed
-  core:unitConversion core:Endpoint .          # proposed
+  core:defaultUnit unit:DEG_C ;
+  core:unitConversion core:Endpoint .

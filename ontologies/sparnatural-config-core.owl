@@ -32,6 +32,32 @@ That other property can itself be annotated with a sparqlString annotation in th
     
 
 
+    <!-- http://data.sparna.fr/ontologies/sparnatural-config-core#valuePath -->
+
+    <owl:AnnotationProperty rdf:about="http://data.sparna.fr/ontologies/sparnatural-config-core#valuePath">
+        <rdfs:comment xml:lang="en">Use this annotation on a property shape that uses the OWL-Time, GeoSPARQL or QUDT widget to replace the path from the intermediate node (the time:Instant, the gsp:Geometry, the qudt:QuantityValue...) to its literal value. The value is a SHACL property path. Without it, the widget uses the standard path of the vocabulary, e.g. gsp:asWKT. With the OWL-Time widget, the literal reached by a custom path is read as an instant.</rdfs:comment>
+        <rdfs:label xml:lang="en">value path</rdfs:label>
+    </owl:AnnotationProperty>
+    
+
+    <!-- http://data.sparna.fr/ontologies/sparnatural-config-core#defaultUnit -->
+
+    <owl:AnnotationProperty rdf:about="http://data.sparna.fr/ontologies/sparnatural-config-core#defaultUnit">
+        <rdfs:comment xml:lang="en">Use this annotation on a property shape that uses the QUDT widget to give the QUDT unit (e.g. unit:KiloGM) preselected in the unit picker. Selected values are shown converted to that unit.</rdfs:comment>
+        <rdfs:label xml:lang="en">default unit</rdfs:label>
+    </owl:AnnotationProperty>
+    
+
+    <!-- http://data.sparna.fr/ontologies/sparnatural-config-core#unitConversion -->
+
+    <owl:AnnotationProperty rdf:about="http://data.sparna.fr/ontologies/sparnatural-config-core#unitConversion">
+        <rdfs:comment xml:lang="en">Use this annotation on a property shape that uses the QUDT widget to say where unit conversion factors come from: config-core:ClientSide (default) for the QUDT unit table bundled with Sparnatural, or config-core:Endpoint for the QUDT units graph loaded in the SPARQL endpoint.</rdfs:comment>
+        <rdfs:label xml:lang="en">unit conversion</rdfs:label>
+    </owl:AnnotationProperty>
+    
+
+
+
     <!-- http://data.sparna.fr/ontologies/sparnatural-config-core#defaultLabelProperty -->
 
     <owl:AnnotationProperty rdf:about="http://data.sparna.fr/ontologies/sparnatural-config-core#defaultLabelProperty">
@@ -247,6 +273,38 @@ The list options can be configured using a datasource annotation, that will typi
     
 
 
+    <!-- http://data.sparna.fr/ontologies/sparnatural-config-core#OwlTimeProperty -->
+
+    <owl:ObjectProperty rdf:about="http://data.sparna.fr/ontologies/sparnatural-config-core#OwlTimeProperty">
+        <rdf:type rdf:resource="http://datashapes.org/dash#SearchWidget" />
+        <rdfs:subPropertyOf rdf:resource="http://data.sparna.fr/ontologies/sparnatural-config-core#SparnaturalProperty"/>
+        <rdfs:comment xml:lang="en">Use this value of dash:searchWidget for properties whose value is an OWL-Time temporal entity (time:Instant, time:Interval...). The widget searches with the Allen relations against a reference period, reading time:inXSD* values, time:hasBeginning / time:hasEnd and DateTimeDescriptions. It is used by default when the property shape has sh:class time:TemporalEntity, time:Instant, time:Interval, time:ProperInterval or time:DateTimeInterval and no NodeShape targets that class.</rdfs:comment>
+        <rdfs:label xml:lang="en">OWL-Time property</rdfs:label>
+    </owl:ObjectProperty>
+    
+
+    <!-- http://data.sparna.fr/ontologies/sparnatural-config-core#GeoSparqlProperty -->
+
+    <owl:ObjectProperty rdf:about="http://data.sparna.fr/ontologies/sparnatural-config-core#GeoSparqlProperty">
+        <rdf:type rdf:resource="http://datashapes.org/dash#SearchWidget" />
+        <rdfs:subPropertyOf rdf:resource="http://data.sparna.fr/ontologies/sparnatural-config-core#SparnaturalProperty"/>
+        <rdfs:comment xml:lang="en">Use this value of dash:searchWidget for properties whose value is a gsp:Geometry (or a gsp:Feature). The widget searches with the GeoSPARQL Simple Features relations (geof:sfWithin, geof:sfIntersects...) or a distance on gsp:asWKT. It is used by default when the property shape has sh:class gsp:Geometry or gsp:Feature and no NodeShape targets that class.</rdfs:comment>
+        <rdfs:label xml:lang="en">GeoSPARQL property</rdfs:label>
+    </owl:ObjectProperty>
+    
+
+    <!-- http://data.sparna.fr/ontologies/sparnatural-config-core#QuantityProperty -->
+
+    <owl:ObjectProperty rdf:about="http://data.sparna.fr/ontologies/sparnatural-config-core#QuantityProperty">
+        <rdf:type rdf:resource="http://datashapes.org/dash#SearchWidget" />
+        <rdfs:subPropertyOf rdf:resource="http://data.sparna.fr/ontologies/sparnatural-config-core#SparnaturalProperty"/>
+        <rdfs:comment xml:lang="en">Use this value of dash:searchWidget for properties whose value is a qudt:QuantityValue (or a qudt:Quantity). The widget compares the numeric value after converting units of the same quantity kind (qudt:hasQuantityKind on the property shape). It is used by default when the property shape has sh:class qudt:QuantityValue or qudt:Quantity and no NodeShape targets that class.</rdfs:comment>
+        <rdfs:label xml:lang="en">QUDT quantity property</rdfs:label>
+    </owl:ObjectProperty>
+    
+
+
+
     <!-- http://data.sparna.fr/ontologies/sparnatural-config-core#NonSelectableProperty -->
 
     <owl:ObjectProperty rdf:about="http://data.sparna.fr/ontologies/sparnatural-config-core#NonSelectableProperty">
@@ -448,6 +506,31 @@ This is rdfs:Literal, provided here for being able to refer to it in Protege.
         <rdfs:comment xml:lang="en">A SPARQL service made available via the SPARQL Protocol. This is defined in the SPARQL service description vocabulary : http://www.w3.org/ns/sparql-service-description#Service</rdfs:comment>
         <rdfs:label xml:lang="en">SPARQL Service</rdfs:label>
     </owl:Class>
+
+
+    <!-- 
+    ///////////////////////////////////////////////////////////////////////////////////////
+    //
+    // Individuals
+    //
+    ///////////////////////////////////////////////////////////////////////////////////////
+     -->
+
+    <!-- http://data.sparna.fr/ontologies/sparnatural-config-core#ClientSide -->
+
+    <owl:NamedIndividual rdf:about="http://data.sparna.fr/ontologies/sparnatural-config-core#ClientSide">
+        <rdfs:comment xml:lang="en">Value of config-core:unitConversion: unit conversion factors come from the QUDT unit table bundled with Sparnatural, written in the generated query.</rdfs:comment>
+        <rdfs:label xml:lang="en">client side</rdfs:label>
+    </owl:NamedIndividual>
+    
+
+
+    <!-- http://data.sparna.fr/ontologies/sparnatural-config-core#Endpoint -->
+
+    <owl:NamedIndividual rdf:about="http://data.sparna.fr/ontologies/sparnatural-config-core#Endpoint">
+        <rdfs:comment xml:lang="en">Value of config-core:unitConversion: unit conversion factors (qudt:conversionMultiplier, qudt:conversionOffset) are read from the QUDT units graph loaded in the SPARQL endpoint.</rdfs:comment>
+        <rdfs:label xml:lang="en">endpoint</rdfs:label>
+    </owl:NamedIndividual>
 </rdf:RDF>
 
 

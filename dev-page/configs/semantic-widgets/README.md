@@ -10,9 +10,9 @@ then follows the value path to the literal on its own.
 | `config.ttl` | Sparnatural SHACL config: Event, Place, Sample |
 | `data.ttl` | 19 events, 12 places, 9 samples, one data pattern or edge case each |
 
-`config.ttl` uses terms that do not exist yet in `sparnatural-config-core`
-(`core:OwlTimeProperty`, `core:defaultUnit`, `core:unitConversion`, ...). They
-are marked `proposed` and arrive with the widget implementation.
+`config.ttl` uses the config terms added with the widgets (`core:OwlTimeProperty`,
+`core:defaultUnit`, `core:unitConversion`), described in
+`ontologies/sparnatural-config-core.owl` and in `docs/widgets.md`.
 
 The expected results below are the reference for the widget tests. The time
 and QUDT rows were checked by running SPARQL 1.1 queries over `data.ttl` with

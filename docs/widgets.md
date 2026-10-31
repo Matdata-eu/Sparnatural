@@ -515,3 +515,187 @@ There is no default behavior for this widhet, it needs to be configured explicit
 ### SPARQL clause
 
 No SPARQL generated.
+
+
+-----
+
+
+## OWL-Time widget
+
+### Appearance
+
+<img src="https://raw.githubusercontent.com/sparna-git/Sparnatural/master/docs/assets/images/readme/23-owl-time.png" />
+
+### Description
+
+Searches on values modelled with [OWL-Time](https://www.w3.org/TR/owl-time/): instants and intervals, open intervals included. The user picks a relation and a reference period, written as one period or a from-to range, at year, month, day or minute granularity. BC years are typed as negative years (-752 is 753 BC).
+
+The relations are:
+- everyday: _within_, _intersects_, _before_ and _after_
+- the 13 Allen relations of OWL-Time: `time:intervalBefore`, `intervalMeets`, `intervalOverlaps`, `intervalStarts`, `intervalDuring`, `intervalFinishes`, `intervalEquals` and their inverses
+- `time:intervalIn` and `time:intervalDisjoint`
+
+The widget reads the following values:
+- `time:inXSDDateTimeStamp`, `time:inXSDDateTime`, `time:inXSDDate`, `time:inXSDgYearMonth` and `time:inXSDgYear`, directly on a `time:Instant` or on the `time:hasBeginning` / `time:hasEnd` of an interval
+- `time:inDateTime` descriptions
+- the `time:hasDateTimeDescription` of a `time:DateTimeInterval`
+
+A value lasts as long as its datatype says: a `xsd:gYear` covers the whole year, and a `xsd:date` covers the whole day. Values without a timezone are read as UTC. `time:inTimePosition` is not supported yet.
+
+When the variable is selected, the result shows the literal of an instant. For an interval it shows `begin/end`, an ISO 8601 interval, with `..` for an open end.
+
+### Configuration
+
+In your SHACL configuration, point the property shape at the intermediate node only. The widget follows the path to the literal by itself.
+
+```turtle
+this:Event_tookPlace sh:path ex:tookPlace ;
+  sh:class time:TemporalEntity .
+```
+
+`dash:searchWidget` [`config-core:OwlTimeProperty`](http://data.sparna.fr/ontologies/sparnatural-config-core#OwlTimeProperty) can also be set explicitly. To read the literal through another path, set `config-core:valuePath`. The value it reaches is then read as an instant.
+
+### Default configuration
+
+The widget is used when the property shape has `sh:class` `time:TemporalEntity`, `time:Instant`, `time:Interval`, `time:ProperInterval` or `time:DateTimeInterval`, and no NodeShape targets that class. If a NodeShape describes `time:Instant`, Sparnatural keeps its usual behaviour.
+
+### Datasources
+
+No datasource required.
+
+### SPARQL clause
+
+The generated SPARQL is plain SPARQL 1.1, without extension functions:
+- Each value is normalised into an `xsd:dateTime` begin (`?Time_b`) and an end start (`?Time_e`), together with the datatype of the end (`?Time_edt`).
+- SPARQL cannot add a month to a date. So instead of computing the end of the value, the bounds of the reference period are shifted by the length of the datatype, and that subtraction is done in the browser.
+
+For example, _within 2020_:
+
+```sparql
+FILTER((?Time_b >= "2020-01-01T00:00:00Z"^^xsd:dateTime) && (BOUND(?Time_e)) && (
+     (?Time_edt = xsd:gYear && ?Time_e <= "2020-01-01T00:00:00Z"^^xsd:dateTime)
+  || (?Time_edt = xsd:gYearMonth && ?Time_e <= "2020-12-01T00:00:00Z"^^xsd:dateTime)
+  || (?Time_edt = xsd:date && ?Time_e <= "2020-12-31T00:00:00Z"^^xsd:dateTime)
+  || (?Time_edt NOT IN (xsd:gYear, xsd:gYearMonth, xsd:date) && ?Time_e <= "2021-01-01T00:00:00Z"^^xsd:dateTime)))
+```
+
+
+-----
+
+
+## GeoSPARQL widget
+
+### Appearance
+
+<img src="https://raw.githubusercontent.com/sparna-git/Sparnatural/master/docs/assets/images/readme/24-geosparql.png" />
+
+### Description
+
+Searches on geometries modelled with [GeoSPARQL](https://www.ogc.org/standard/geosparql/). The user picks a relation and gives a reference geometry, either by drawing a point, line, rectangle, polygon or circle on the map, or by typing WKT in longitude-latitude order.
+
+The relations are the GeoSPARQL Simple Features functions:
+- _within_ (`geof:sfWithin`)
+- _intersects_ (`geof:sfIntersects`)
+- _contains_ (`geof:sfContains`)
+- _does not touch_ (`geof:sfDisjoint`)
+- _touches the edge of_ (`geof:sfTouches`)
+- _overlaps_ (`geof:sfOverlaps`)
+- _crosses_ (`geof:sfCrosses`)
+- _is the same shape as_ (`geof:sfEquals`)
+
+There is also _within N km of_, using `geof:distance`. Drawing a circle selects _within N km of_ its centre.
+
+Only standard functions and `gsp:asWKT` are used, so the query behaves the same on every compliant triplestore. When the variable is selected, the result shows the WKT literal.
+
+### Configuration
+
+Point the property shape at the geometry:
+
+```turtle
+this:Place_hasGeometry sh:path gsp:hasGeometry ;
+  sh:class gsp:Geometry .
+```
+
+When `sh:class` is `gsp:Feature`, the widget goes through `gsp:hasDefaultGeometry|gsp:hasGeometry`. `dash:searchWidget` [`config-core:GeoSparqlProperty`](http://data.sparna.fr/ontologies/sparnatural-config-core#GeoSparqlProperty) and `config-core:valuePath` work as for the OWL-Time widget. The map centre and zoom come from the `customization.map` setting, as for the map widget.
+
+### Default configuration
+
+The widget is used when the property shape has `sh:class` `gsp:Geometry` or `gsp:Feature`, and no NodeShape targets that class.
+
+### Datasources
+
+No datasource required.
+
+### SPARQL clause
+
+```sparql
+?Place gsp:hasGeometry ?Geometry_node .
+?Geometry_node gsp:asWKT ?Geometry .
+FILTER(geof:sfWithin(?Geometry, "POLYGON((4.33 50.83, 4.40 50.83, 4.40 50.86, 4.33 50.86, 4.33 50.83))"^^gsp:wktLiteral))
+```
+
+```sparql
+FILTER(geof:distance(?Geometry, "POINT(4.3522 50.8467)"^^gsp:wktLiteral, uom:metre) <= 5000.0)
+```
+
+
+-----
+
+
+## QUDT quantity widget
+
+### Appearance
+
+<img src="https://raw.githubusercontent.com/sparna-git/Sparnatural/master/docs/assets/images/readme/25-qudt.png" />
+
+### Description
+
+Searches on quantities modelled with [QUDT](https://qudt.org/): a `qudt:QuantityValue`, or a `qudt:Quantity` with a `qudt:quantityValue`, holding a `qudt:numericValue` (or `qudt:value`) and a `qudt:unit` (or `qudt:hasUnit`).
+
+- **Criteria:** the user picks an operator (=, ≠, <, ≤, >, ≥, between), one or two values, and a unit among the units of the quantity kind of the property.
+- **Conversion:** values recorded in other units of the same kind are converted before they are compared, using the QUDT convention `SI = (value + conversionOffset) × conversionMultiplier`. The comparison has a relative tolerance of 1e-9.
+- **Kind check:** values recorded in a unit of another quantity kind, such as a mass recorded in metres, never match.
+- **Results:** when the variable is selected, the result shows the value converted to `config-core:defaultUnit` if it is set, otherwise the stored value.
+
+### Configuration
+
+```turtle
+this:Sample_mass sh:path ex:mass ;
+  sh:class qudt:QuantityValue ;
+  qudt:hasQuantityKind quantitykind:Mass ;
+  config-core:defaultUnit unit:KiloGM ;
+  config-core:unitConversion config-core:ClientSide .
+```
+
+| Annotation | Meaning |
+| --- | --- |
+| `qudt:hasQuantityKind` | The quantity kind. It limits the units in the picker and the units that match. If it is missing, the kinds of the default unit are used. |
+| [`config-core:defaultUnit`](http://data.sparna.fr/ontologies/sparnatural-config-core#defaultUnit) | The unit preselected in the picker, and the unit results are shown in. |
+| [`config-core:unitConversion`](http://data.sparna.fr/ontologies/sparnatural-config-core#unitConversion) | `config-core:ClientSide` (default): conversion factors come from the QUDT unit table bundled with Sparnatural, built from QUDT v3.5.3 by `scripts/build-qudt-units.mjs`. `config-core:Endpoint`: factors are read from the QUDT units graph loaded in the endpoint. |
+
+`dash:searchWidget` [`config-core:QuantityProperty`](http://data.sparna.fr/ontologies/sparnatural-config-core#QuantityProperty) can also be set explicitly.
+
+### Default configuration
+
+The widget is used when the property shape has `sh:class` `qudt:QuantityValue` or `qudt:Quantity`, and no NodeShape targets that class.
+
+### Datasources
+
+No datasource required.
+
+### SPARQL clause
+
+In client-side mode, the conversion factors of the units of the quantity kind are written in a `VALUES` block:
+
+```sparql
+?Sample ex:mass ?Quantity_node .
+?Quantity_node (qudt:quantityValue/(qudt:numericValue|qudt:value))|qudt:numericValue|qudt:value ?Quantity_v .
+?Quantity_node (qudt:quantityValue/(qudt:unit|qudt:hasUnit))|qudt:unit|qudt:hasUnit ?Quantity_unit .
+VALUES (?Quantity_unit ?Quantity_m ?Quantity_o) {
+  (unit:GM 1e-3 0e+0) (unit:KiloGM 1e+0 0e+0) (unit:LB 4.5359237e-1 0e+0) ...
+}
+BIND((?Quantity_v + ?Quantity_o) * ?Quantity_m AS ?Quantity_si)
+FILTER(?Quantity_si >= 2e+0 - 2.000000000001e-9)
+```
+
+In endpoint mode, `qudt:conversionMultiplier` and `qudt:conversionOffset` are joined from the endpoint instead, for the units of the data and for the unit of the criteria.
